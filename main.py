@@ -6,7 +6,7 @@ generador = GeneradorCsvAvro(
     nombre_entidad = "CSISAS",
     fecha_corte=2070,
     ruta_schema="Esquema_AVRO.json",
-    ruta_csv="ArchivoCSV.csv"
+    ruta_csv=r"Data\ArchivoCSV.csv"
 )
 
 generador.ejecutar("ArchivoGenerado.avro", "inconsistencias.log")
