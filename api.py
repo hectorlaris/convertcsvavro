@@ -129,13 +129,16 @@ async def convert_csv_to_avro(
             if avro_path.exists():
                 shutil.copy2(avro_path, final_avro_path)
                 
+                # Solo devolver el nombre del archivo, no la ruta completa
+                filename_only = final_avro_path.name
+                
                 return ConversionResponse(
                     success=True,
                     message="Conversión completada exitosamente",
                     registros_validos=registros_validos,
                     registros_invalidos=registros_invalidos,
                     inconsistencias=inconsistencias if inconsistencias else None,
-                    avro_file_path=str(final_avro_path)
+                    avro_file_path=filename_only  # Solo el nombre del archivo
                 )
             else:
                 return ConversionResponse(
@@ -227,13 +230,16 @@ async def convert_with_default_schema(
             if avro_path.exists():
                 shutil.copy2(avro_path, final_avro_path)
                 
+                # Solo devolver el nombre del archivo, no la ruta completa
+                filename_only = final_avro_path.name
+                
                 return ConversionResponse(
                     success=True,
                     message="Conversión completada con esquema por defecto",
                     registros_validos=registros_validos,
                     registros_invalidos=registros_invalidos,
                     inconsistencias=inconsistencias if inconsistencias else None,
-                    avro_file_path=str(final_avro_path)
+                    avro_file_path=filename_only  # Solo el nombre del archivo
                 )
             else:
                 return ConversionResponse(

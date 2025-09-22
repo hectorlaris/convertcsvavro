@@ -1,0 +1,467 @@
+{
+	"info": {
+		"_postman_id": "csv-avro-converter-api",
+		"name": "CSV to AVRO Converter API",
+		"description": "Colección completa para probar el microservicio de conversión CSV a AVRO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 - Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData.status).to.eql('healthy');",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Verifica que el servicio esté funcionando correctamente"
+			},
+			"response": []
+		},
+		{
+			"name": "02 - Service Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains service info\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('service');",
+							"    pm.expect(jsonData).to.have.property('version');",
+							"    pm.expect(jsonData).to.have.property('endpoints');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "Obtiene información general del servicio"
+			},
+			"response": []
+		},
+		{
+			"name": "03 - Convert with Default Schema",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('success');",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData).to.have.property('registros_validos');",
+							"    pm.expect(jsonData).to.have.property('registros_invalidos');",
+							"});",
+							"",
+							"pm.test(\"Conversion was successful\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});",
+							"",
+							"// Guardar el path del archivo para descarga posterior",
+							"if (pm.response.json().avro_file_path) {",
+							"    pm.globals.set(\"avro_file_path\", pm.response.json().avro_file_path);",
+							"    var filename = pm.response.json().avro_file_path.split('/').pop();",
+							"    pm.globals.set(\"avro_filename\", filename);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "tipo_entidad",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "codigo_entidad",
+							"value": "123456",
+							"type": "text"
+						},
+						{
+							"key": "nombre_entidad",
+							"value": "POSTMAN_TEST",
+							"type": "text"
+						},
+						{
+							"key": "fecha_corte",
+							"value": "2024",
+							"type": "text"
+						},
+						{
+							"key": "csv_file",
+							"type": "file",
+							"src": "Data/ArchivoCSV.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/convert-with-default-schema",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"convert-with-default-schema"
+					]
+				},
+				"description": "Convierte un archivo CSV usando el esquema por defecto"
+			},
+			"response": []
+		},
+		{
+			"name": "04 - Convert with Custom Schema",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('success');",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData).to.have.property('registros_validos');",
+							"    pm.expect(jsonData).to.have.property('registros_invalidos');",
+							"});",
+							"",
+							"pm.test(\"Conversion was successful\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "tipo_entidad",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "codigo_entidad",
+							"value": "789012",
+							"type": "text"
+						},
+						{
+							"key": "nombre_entidad",
+							"value": "POSTMAN_CUSTOM",
+							"type": "text"
+						},
+						{
+							"key": "fecha_corte",
+							"value": "2024",
+							"type": "text"
+						},
+						{
+							"key": "csv_file",
+							"type": "file",
+							"src": "Data/ArchivoCSV.csv"
+						},
+						{
+							"key": "schema_file",
+							"type": "file",
+							"src": "Esquema_AVRO.json"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/convert",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"convert"
+					]
+				},
+				"description": "Convierte un archivo CSV usando un esquema personalizado"
+			},
+			"response": []
+		},
+		{
+			"name": "05 - Download AVRO File",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is binary data\", function () {",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/octet-stream');",
+							"});",
+							"",
+							"pm.test(\"File has content\", function () {",
+							"    pm.expect(pm.response.responseSize).to.be.above(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/download/{{avro_filename}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"download",
+						"{{avro_filename}}"
+					]
+				},
+				"description": "Descarga un archivo AVRO generado"
+			},
+			"response": []
+		},
+		{
+			"name": "06 - Error Test - Invalid CSV",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Error message is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('detail');",
+							"    pm.expect(jsonData.detail).to.include('CSV');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "tipo_entidad",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "codigo_entidad",
+							"value": "123456",
+							"type": "text"
+						},
+						{
+							"key": "nombre_entidad",
+							"value": "ERROR_TEST",
+							"type": "text"
+						},
+						{
+							"key": "fecha_corte",
+							"value": "2024",
+							"type": "text"
+						},
+						{
+							"key": "csv_file",
+							"type": "file",
+							"src": "Esquema_AVRO.json"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/convert-with-default-schema",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"convert-with-default-schema"
+					]
+				},
+				"description": "Prueba de error: enviar archivo JSON como CSV"
+			},
+			"response": []
+		},
+		{
+			"name": "07 - Error Test - Missing Parameters",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							"pm.test(\"Validation error returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('detail');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "tipo_entidad",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/convert-with-default-schema",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"convert-with-default-schema"
+					]
+				},
+				"description": "Prueba de error: parámetros faltantes"
+			},
+			"response": []
+		},
+		{
+			"name": "08 - Error Test - File Not Found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"File not found error\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('detail');",
+							"    pm.expect(jsonData.detail).to.include('encontrado');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/download/archivo_inexistente.avro",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"download",
+						"archivo_inexistente.avro"
+					]
+				},
+				"description": "Prueba de error: archivo no encontrado"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8002",
+			"type": "string"
+		}
+	]
+}
